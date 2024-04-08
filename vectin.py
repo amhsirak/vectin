@@ -156,3 +156,73 @@ class Vectin:
         for token in tokens:
             vector[self._word_to_index[token]] += 1
         return vector
+
+    @staticmethod
+    def sentence_word_splitter(num_of_words: int, sentence: str) -> list:
+        """
+        Split a sentence into chunks of words.
+
+        Args:
+            num_of_words: Number of words per chunk.
+            sentence: The input sentence.
+
+        Returns:
+            List of sentence chunks.
+        """
+        pieces = sentence.split()
+        return [" ".join(pieces[i:i+num_of_words]) for i in range(0, len(pieces), num_of_words)]
+
+    @staticmethod
+    def chunk_text_to_fixed_length(text: str, length: int):
+        """
+        Chunk a text into fixed-length chunks.
+
+        Args:
+            text: The input text.
+            length: The desired length of each chunk.
+
+        Returns:
+            List of fixed-length text chunks.
+        """
+        text = text.strip()
+        return [text[0+i:length+i] for i in range(0, len(text), length)]
+
+    def chunk_sentences_to_fixed_length(self, sentences: list, max_length: int = 768):
+        """
+        Chunk sentences into fixed-length segments.
+
+        Args:
+            sentences: List of sentences.
+            max_length: Maximum length of each segment.
+
+        Returns:
+            List of fixed-length sentence segments.
+        """
+        fixed_size_sentences = []
+        for sentence in sentences:
+            chunks = Vectin.chunk_text_to_fixed_length(
+                text=sentence, length=max_length)
+            fixed_size_sentences.extend(chunks)
+        return fixed_size_sentences
+
+    def chunk_sentences_to_max_tokens(self, sentences: list, max_tokens: int = 768):
+        """
+        Chunk sentences into segments with a maximum number of tokens.
+
+        Args:
+            sentences: List of sentences.
+            max_tokens: Maximum number of tokens per segment.
+
+        Returns:
+            List of sentence segments.
+        """
+        fixed_size_sentences = []
+        for sentence in sentences:
+            tokens = sentence.lower().split()
+            if len(tokens) > max_tokens:
+                chunks = Vectin.sentence_word_splitter(
+                    num_of_words=max_tokens, sentence=sentence)
+                fixed_size_sentences.extend(chunks)
+            else:
+                fixed_size_sentences.append(sentence)
+        return fixed_size_sentences
