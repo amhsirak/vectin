@@ -226,3 +226,48 @@ class Vectin:
             else:
                 fixed_size_sentences.append(sentence)
         return fixed_size_sentences
+    
+    def sentences_to_vector(self, sentences: list) -> list:
+        """
+        Convert list of sentences to vector representations.
+
+        Args:
+            sentences: List of sentences.
+
+        Returns:
+            Dictionary mapping sentences to their vector representations.
+        """
+        sentence_vectors = {}
+        for sentence in sentences:
+            vector = self.text_to_vector(sentence)
+            sentence_vectors[sentence] = vector
+        return sentence_vectors
+
+    def _update_vocabulary_and_index(self, sentences: list):
+        """
+        Update vocabulary and index based on input sentences.
+
+        Args:
+            sentences: List of sentences.
+        """
+        for sentence in sentences:
+            tokens = sentence.lower().split()
+            self._vocabulary.update(tokens)
+        self._word_to_index = {word: i for i,
+                               word in enumerate(self._vocabulary)}
+
+    def encode(self, sentences: list):
+        """
+        Encode list of sentences into vector representations.
+
+        Args:
+            sentences: List of sentences.
+
+        Returns:
+            Dictionary mapping sentences to their vector representations.
+        """
+        self._update_vocabulary_and_index(sentences)
+        sentence_vectors = self.sentences_to_vector(sentences)
+        return sentence_vectors
+
+
