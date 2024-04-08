@@ -303,3 +303,23 @@ class Vectin:
         print(f"</vectorstore>\n")
         print(f"-------------------" * 5)
 
+    def similarity_search(self, query: str, num_results: int = 3):
+        """
+        Search for similar vectors based on a query.
+
+        Args:
+            query: The query string.
+            num_results: Number of similar vectors to retrieve.
+
+        Returns:
+            List of similar vectors.
+        """
+        query_vector = self.text_to_vector(query)
+        similar_sentences = self.find_similar_vectors(
+            query_vector, num_results=num_results
+        )
+        result = []
+        for sentence, similarity in similar_sentences:
+            result.append([sentence, f"{similarity:.6}"])
+        return result
+
