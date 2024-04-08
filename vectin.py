@@ -91,7 +91,7 @@ class Vectin:
             The vector data corresponding to the given identifier.
         """
         return self._vector_data.get(vector_id)
-    
+
     def _cosine_similarity(self, vector1, vector2):
         """
         Calculate the cosine similarity between two vectors.
@@ -226,7 +226,7 @@ class Vectin:
             else:
                 fixed_size_sentences.append(sentence)
         return fixed_size_sentences
-    
+
     def sentences_to_vector(self, sentences: list) -> list:
         """
         Convert list of sentences to vector representations.
@@ -323,3 +323,95 @@ class Vectin:
             result.append([sentence, f"{similarity:.6}"])
         return result
 
+    def save_to_disk(self):
+        """
+        Save vector data to disk.
+        """
+        self._init_persistence(self._data_storage_path, self._cache_path)
+        save_path = datafile = self._data_storage_path+"/"+self._name
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+        datafile = save_path+"/"+self._name
+        joblib.dump(self._vector_data, datafile +
+                    ".data.gz", compress=('gzip', 3))
+        joblib.dump(self._vector_index, datafile +
+                    ".index.gz", compress=('gzip', 3))
+        joblib.dump(self._vocabulary, datafile +
+                    ".vocabulary.gz", compress=('gzip', 3))
+        joblib.dump(self._word_to_index, datafile +
+                    ".word_to_index.gz", compress=('gzip', 3))
+        with open(datafile+".hash", "w", newline="") as file:
+            file.write(str(joblib.hash(self)))
+        print(f"Vectin data files {datafile} saved to disk!")
+
+    @classmethod
+    def load_from_disk(cls, name: str = "default", data_storage_path: str = None, max_tokens: int = 768):
+        """
+        Load vector data from disk.
+
+        Args:
+            name: The name of the data to load.
+            data_storage_path: The path where the data is stored.
+            max_tokens: Maximum number of tokens.
+
+        Returns:
+            An instance of Vectin loaded from disk.
+        """
+        if data_storage_path is None:
+            datafile = str(cls._DATA_STORAGE_PATH)+"/"+name
+        else:
+            datafile = str(data_storage_path)+"/"+name+"/"+name
+        print("loading directory ", datafile)
+        if os.path.exists(datafile+".data.gz"):
+            instance = cls(max_tokens=max_tokens)
+            instance._vector_data = joblib.load(datafile+".data.gz")
+            instance._vector_index = joblib.load(datafile+".index.gz")
+            instance._vocabulary = joblib.load(datafile+".vocabulary.gz")
+            instance._word_to_index = joblib.load(datafile+".word_to_index.gz")
+            print("Vectin data file loaded!")
+            return instance
+        else:
+            print("Missing Vectin data file!")
+            return cls()
+
+    @classmethod
+    def delete_from_disk(cls, data_storage_path: str = None, confirm_deletion: str = "N"):
+        """
+        Delete vector data from disk.
+
+        Args:
+            data_storage_path: The path where the data is stored.
+            confirm_deletion: Flag to confirm deletion.
+        """
+        if confirm_deletion == "Y":
+            print("delete persistence directory from disk...")
+            if data_storage_path is None:
+                raise ValueError("Missing Vectin data file!")
+            shutil.rmtree(data_storage_path)
+            print(f"deleted from disk: {data_storage_path}")
+        else:
+            raise ValueError("please confirm deletion by setting flag to Y")
+
+    @staticmethod
+    def get_or_create_vectorstore(name: str = "default", storage_path: str = None, max_tokens: int = 768):
+        """
+        Get or create a vectorstore instance.
+
+        Args:
+            name: Name of the vectorstore.
+            storage_path: Path to store the vectorstore.
+            max_tokens: Maximum number of tokens.
+
+        Returns:
+            A Vectin instance.
+        """
+        if storage_path is None:
+            storage_path = "./tvdb"
+        local_storage_path = storage_path+"/" + name
+        if os.path.exists(local_storage_path):
+            vectin = Vectin.load_from_disk(
+                name=name, data_storage_path=storage_path, max_tokens=max_tokens)
+        else:
+            vectin = Vectin(name=name, max_tokens=max_tokens,
+                            persist_data=True, data_storage_path=local_storage_path)
+        return vectin
