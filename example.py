@@ -32,5 +32,5 @@ def similarity_search():
 
 
 if __name__ == "__main__":
-    print("\n✨ ✨ ✨ Vectin Inittt ✨ ✨ ✨\n")
+    print("\n... Vectin Inittt ... \n")
     similarity_search()
