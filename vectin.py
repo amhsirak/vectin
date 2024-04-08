@@ -290,19 +290,6 @@ class Vectin:
         for key in sentence_vectors.keys():
             self.add_vector(vector_id=key, vector=sentence_vectors[key])
 
-    def dump(self):
-        """
-        Dump vector data, vocabulary, index, and data to console.
-        """
-        print(f"-------------------" * 5)
-        print(f"<vectorstore>")
-        print(f"<vocabulary>{self._vocabulary}</vocabulary>")
-        print(f"<word_to_index>{self._word_to_index}</word_to_index>")
-        print(f"<vector_index>{self._vector_index}</vector_index>")
-        print(f"<vector_data>{self._vector_data}</vector_data>")
-        print(f"</vectorstore>\n")
-        print(f"-------------------" * 5)
-
     def similarity_search(self, query: str, num_results: int = 3):
         """
         Search for similar vectors based on a query.
