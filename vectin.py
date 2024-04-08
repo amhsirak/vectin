@@ -91,3 +91,19 @@ class Vectin:
             The vector data corresponding to the given identifier.
         """
         return self._vector_data.get(vector_id)
+    
+    def _cosine_similarity(self, vector1, vector2):
+        """
+        Calculate the cosine similarity between two vectors.
+
+        Args:
+            vector1: First vector.
+            vector2: Second vector.
+
+        Returns:
+            The cosine similarity between the two vectors.
+        """
+        dot_product = np.dot(vector1, vector2)
+        norm_vector1 = np.linalg.norm(vector1)
+        norm_vector2 = np.linalg.norm(vector2)
+        return dot_product / (norm_vector1 * norm_vector2)
