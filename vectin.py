@@ -107,3 +107,52 @@ class Vectin:
         norm_vector1 = np.linalg.norm(vector1)
         norm_vector2 = np.linalg.norm(vector2)
         return dot_product / (norm_vector1 * norm_vector2)
+
+    def _update_index(self, vector_id, vector):
+        """
+        Update the index with a new vector.
+
+        Args:
+            vector_id: Identifier for the vector.
+            vector: The vector data.
+        """
+        for existing_id, existing_vector in self._vector_data.items():
+            similarity = self._cosine_similarity(vector, existing_vector)
+            if existing_id not in self._vector_index:
+                self._vector_index[existing_id] = {}
+            self._vector_index[existing_id][vector_id] = similarity
+
+    def find_similar_vectors(self, query_vector, num_results=5):
+        """
+        Find similar vectors to a given query vector.
+
+        Args:
+            query_vector: The vector to compare against.
+            num_results: Number of similar vectors to retrieve.
+
+        Returns:
+            List of similar vectors.
+        """
+        results = []
+        for vector_id, vector in self._vector_data.items():
+            similarity = self._cosine_similarity(query_vector, vector)
+            results.append((vector_id, similarity))
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results[:num_results]
+
+    def text_to_vector(self, sentence: str):
+        """
+        Convert text sentence to vector representation.
+
+        Args:
+            sentence: The text sentence to convert.
+
+        Returns:
+            The vector representation of the sentence.
+        """
+        self._update_vocabulary_and_index([sentence])
+        tokens = sentence.lower().split()
+        vector = np.zeros(self._max_tokens)
+        for token in tokens:
+            vector[self._word_to_index[token]] += 1
+        return vector
