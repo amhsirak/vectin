@@ -393,7 +393,7 @@ class Vectin:
             A Vectin instance.
         """
         if storage_path is None:
-            storage_path = "./tvdb"
+            storage_path = "./vectdb"
         local_storage_path = storage_path+"/" + name
         if os.path.exists(local_storage_path):
             vectin = Vectin.load_from_disk(
