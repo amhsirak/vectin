@@ -270,4 +270,36 @@ class Vectin:
         sentence_vectors = self.sentences_to_vector(sentences)
         return sentence_vectors
 
+    def save_text(self, key: str, content: str):
+        """
+        Save text content with a specified key.
+
+        Args:
+            key: The key to associate with the text content.
+            content: The text content to save.
+        """
+        self.add_vector(vector_id=key, vector=content)
+
+    def insert_vectors(self, sentence_vectors: list):
+        """
+        Insert multiple vectors into the database.
+
+        Args:
+            sentence_vectors: List of vectors to insert.
+        """
+        for key in sentence_vectors.keys():
+            self.add_vector(vector_id=key, vector=sentence_vectors[key])
+
+    def dump(self):
+        """
+        Dump vector data, vocabulary, index, and data to console.
+        """
+        print(f"-------------------" * 5)
+        print(f"<vectorstore>")
+        print(f"<vocabulary>{self._vocabulary}</vocabulary>")
+        print(f"<word_to_index>{self._word_to_index}</word_to_index>")
+        print(f"<vector_index>{self._vector_index}</vector_index>")
+        print(f"<vector_data>{self._vector_data}</vector_data>")
+        print(f"</vectorstore>\n")
+        print(f"-------------------" * 5)
 
